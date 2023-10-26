@@ -89,23 +89,12 @@ if selection == "NFT Lookup":
 
 elif selection == "Market Analysis":
    
-     # Top 10 Most Selling Collections
-    st.write("Top 10 Most Selling Collections")
-    top_collections = nft_data['asset.collection.name'].value_counts()
-    if 'uncategorized' in top_collections.index:
-        top_collections = top_collections.drop('uncategorized')
-    if 'unknown' in top_collections.index:
-        top_collections = top_collections.drop('unknown')
-    st.bar_chart(top_collections.head(10))
-
-    # Top 10 Most Selling NFTs
-    st.write("Top 10 Most Selling NFTs")
-    top_nfts = nft_data['asset.name'].value_counts()
-    if 'uncategorized' in top_nfts.index:
-        top_nfts = top_nfts.drop('uncategorized')
-    if 'unknown' in top_nfts.index:
-        top_nfts = top_nfts.drop('unknown')
-    st.bar_chart(top_nfts.head(10))
+    st.header("Market Analysis: Collections in Demand")
+    
+    # Count sales by collection
+    collections = nft_data[nft_data['asset.collection.name'] != 'uncategorized'].groupby('asset.collection.name').size().sort_values(ascending=False).head(10)
+    fig = px.bar(collections, title='Top 10 Collections by Sales Volume')
+    st.plotly_chart(fig)
 
 
 elif selection == "User/Trader Analysis":
