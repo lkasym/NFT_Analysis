@@ -9,7 +9,7 @@ import pickle
 
 # Load the models
 lr_model = pickle.load(open("linear_regression_model.pkl", "rb"))
-knn_model = pickle.load(open("/mnt/data/knn_model.pkl", "rb"))
+knn_model = pickle.load(open("knn_model.pkl", "rb"))
 
 data_path = "Processed_OpenSea_NFT_1_Sales.csv"
 nft_data = pd.read_csv(data_path)
