@@ -80,7 +80,7 @@ if nft_name:
         # Linear Regression Prediction
         if st.button("Predict Price with Linear Regression"):
             price_lr = lr_model.predict([[selected_nft['asset.num_sales'].iloc[0]]])
-            st.write(f"Rough Price Prediction (using Linear Regression): {price_lr[0][0]}")
+            st.write(f"Rough Price Prediction (using Linear Regression): {price_lr[0]}")
         
         # KNN Prediction
         if st.button("Predict Price with KNN"):
