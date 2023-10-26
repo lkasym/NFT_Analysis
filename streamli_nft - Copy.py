@@ -6,12 +6,12 @@ import pickle
 import matplotlib.pyplot as plt
 
 # Load the models and data
-lr_model = pickle.load(open("/mnt/data/linear_regression_model.pkl", "rb"))
-lstm_model = load_model("/mnt/data/lstm_model.h5")
-with open("/mnt/data/lstm_scaler.pkl", "rb") as f:
+lr_model = pickle.load(open("linear_regression_model.pkl", "rb"))
+lstm_model = load_model("lstm_model.h5")
+with open("lstm_scaler.pkl", "rb") as f:
     lstm_scaler = pickle.load(f)
 
-data_path = "path_to_your_data.csv"  # Update with your path
+data_path = "Processed_OpenSea_NFT_1_Sales.csv"  # Update with your path
 nft_data = pd.read_csv(data_path)
 nft_data['price_in_ether'] = nft_data['total_price'] / 1e18
 
