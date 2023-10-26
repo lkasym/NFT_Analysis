@@ -4,17 +4,16 @@ import numpy as np
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.neighbors import KNeighborsRegressor
 import plotly.graph_objects as go
-import plotly.express as px
 import pickle
 
 # Load the models and data
+lr_model = pickle.load(open("linear_regression_model.pkl", "rb"))
+knn_model = pickle.load(open("knn_model.pkl", "rb"))
+
 data_path = "Processed_OpenSea_NFT_1_Sales.csv"
 nft_data = pd.read_csv(data_path)
 nft_data['price_in_ether'] = nft_data['total_price'] / 1e18
-lr_model = pickle.load(open("linear_regression_model.pkl", "rb"))
-knn_model = pickle.load(open("knn_model.pkl", "rb"))
 
 def create_dataset(dataset, look_back=1):
     X, Y = [], []
@@ -64,29 +63,57 @@ def predict_price_lstm(nft_name, data):
 
 st.title("NFT Explorer and Price Predictor")
 
-selection = st.sidebar.selectbox("Choose an Analysis Option:", ["NFT Lookup", "Market Analysis", "User/Trader Analysis", "NFT Categories"])
+# NFT Lookup
+nft_name = st.text_input("Enter NFT name:")
 
-if selection == "NFT Lookup":
-    # NFT Lookup Code
-    nft_name = st.text_input("Enter NFT name:")
-    if nft_name:
-        selected_nft = nft_data[nft_data['asset.name'] == nft_name]
-        if not selected_nft.empty:
-            # Display NFT details and previous owners
-            st.write("NFT Details")
-            st.table(selected_nft[['asset.name', 'asset.collection.name', 'Category', 'asset.num_sales', 'price_in_ether']])
-            # Price prediction using Linear Regression
+if nft_name:
+    selected_nft = nft_data[nft_data['asset.name'] == nft_name]
+
+    if not selected_nft.empty:
+        # Display NFT details
+        st.write(f"Name: {selected_nft['asset.name'].iloc[0]}")
+        st.write(f"Collection: {selected_nft['asset.collection.name'].iloc[0]}")
+        st.write(f"Category: {selected_nft['Category'].iloc[0]}")
+        st.write(f"Number of Sales: {selected_nft['asset.num_sales'].iloc[0]}")
+        st.write(f"Last Sale Price in Ether: {selected_nft['price_in_ether'].iloc[0]}")
+        
+        # Linear Regression Prediction
+        if st.button("Predict Price with Linear Regression"):
             price_lr = lr_model.predict([[selected_nft['asset.num_sales'].iloc[0]]])
             st.write(f"Rough Price Prediction (using Linear Regression): {price_lr[0][0]}")
-            # Price prediction using KNN
+        
+        # KNN Prediction
+        if st.button("Predict Price with KNN"):
             price_knn = knn_model.predict([[selected_nft['asset.num_sales'].iloc[0]]])
             st.write(f"Rough Price Prediction (using KNN): {price_knn[0][0]}")
-            # Price prediction using LSTM
+        
+        # LSTM Prediction
+        if st.button("Predict Price with LSTM"):
             price_lstm = predict_price_lstm(nft_name, nft_data)
             if isinstance(price_lstm, str):
                 st.write(price_lstm)
             else:
                 st.write(f"Better Price Prediction (using LSTM): {price_lstm}")
+
+        # Plotting the historical prices using Plotly
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=selected_nft['sales_datetime'], y=selected_nft['price_in_ether'], mode='lines', name='Price in Ether'))
+        fig.update_layout(title='Historical Prices of the NFT in Ether', xaxis_title='Date', yaxis_title='Price in Ether')
+        st.plotly_chart(fig)
+        # Previous owners
+        st.write("Previous Owners")
+        past_owners = nft_data[nft_data['asset.name'] == nft_name].sort_values(by='sales_datetime', ascending=False)['seller.user.username'].dropna().unique()
+        if len(past_owners) > 0:
+            st.table(past_owners[:10])
+        else:
+            st.write("No past owner data available.")
+
+
+    else:
+        st.write("NFT not found in the dataset.")
+
+# ... [Rest of the code for other options like "Market Analysis", "User/Trader Analysis", etc.]
+
 
 elif selection == "Market Analysis":
    
