@@ -14,6 +14,8 @@ knn_model = pickle.load(open("knn_model.pkl", "rb"))
 data_path = "Processed_OpenSea_NFT_1_Sales.csv"
 nft_data = pd.read_csv(data_path)
 nft_data['price_in_ether'] = nft_data['total_price'] / 1e18
+if 'lstm_clicked' not in st.session_state:
+    st.session_state.lstm_clicked = False
 
 def create_dataset(dataset, look_back=1):
     X, Y = [], []
@@ -62,8 +64,7 @@ def predict_price_lstm(nft_name, data):
     return testPredict[-1][0]
 
 st.title("NFT Explorer and Price Predictor")
-if 'lstm_clicked' not in st.session_state:
-    st.session_state.lstm_clicked = False
+
 
 # NFT Lookup
 nft_name = st.text_input("Enter NFT name:")
