@@ -1,14 +1,26 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 import pickle
 import matplotlib.pyplot as plt
+import requests
+from bs4 import BeautifulSoup
 
+def get_opensea_image_url(opensea_url):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+    response = requests.get(opensea_url, headers=headers)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    image_tag = soup.find("meta", {"property": "og:image"})
+    if image_tag:
+        return image_tag["content"]
+    else:
+        return None
 
-# Define the LSTM prediction function
 def predict_price_lstm(nft_name, data):
     if nft_name not in data['asset.name'].values:
         return None
@@ -26,13 +38,13 @@ def predict_price_lstm(nft_name, data):
     nft_data = nft_data.reshape(-1, 1)
     
     if len(nft_data) <= look_back + 2:
-        return "Insufficient data for LSTM prediction"
+        return {"Predicted Prices": "Insufficient data for LSTM prediction"}
 
     train_size = int(len(nft_data) * 0.7)
     train, test = nft_data[0:train_size,:], nft_data[train_size:len(nft_data),:]
 
     if len(train) <= look_back + 2 or len(test) <= look_back + 2:
-        return "Insufficient data for LSTM prediction after splitting"
+        return {"Predicted Prices": "Insufficient data for LSTM prediction after splitting"}
 
     scaler = MinMaxScaler()
     train = scaler.fit_transform(train)
@@ -53,45 +65,46 @@ def predict_price_lstm(nft_name, data):
     testPredict = model.predict(testX)
     testPredict = scaler.inverse_transform(testPredict)
     
-    return testPredict[-1][0]
+    return {"Predicted Prices": testPredict[:,0].tolist()}
 
-
-# Load the Linear Regression model
+# Load the models and data
 lr_model = pickle.load(open("linear_regression_model.pkl", "rb"))
-
-# Load the data
 data_path = "Processed_OpenSea_NFT_1_Sales.csv"
 nft_data = pd.read_csv(data_path)
 nft_data['price_in_ether'] = nft_data['total_price'] / 1e18
 
 st.title("NFT Explorer and Price Predictor")
 
-# NFT Lookup
 nft_name = st.text_input("Enter NFT name:")
 
 if nft_name:
     selected_nft = nft_data[nft_data['asset.name'] == nft_name]
     
     if not selected_nft.empty:
-        # Display NFT details
-        st.image(selected_nft['asset.permalink'].iloc[0])
+        image_url = get_opensea_image_url(selected_nft['asset.permalink'].iloc[0])
+        if image_url:
+            st.image(image_url)
+        
         st.write(f"Name: {selected_nft['asset.name'].iloc[0]}")
         st.write(f"Collection: {selected_nft['asset.collection.name'].iloc[0]}")
         st.write(f"Category: {selected_nft['Category'].iloc[0]}")
         st.write(f"Number of Sales: {selected_nft['asset.num_sales'].iloc[0]}")
         st.write(f"Last Sale Price in Ether: {selected_nft['price_in_ether'].iloc[0]}")
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(selected_nft['sales_datetime'], selected_nft['price_in_ether'])
+        plt.xlabel('Date')
+        plt.ylabel('Price in Ether')
+        plt.title('Historical Prices')
+        st.pyplot(plt)
+
+        price = lr_model.predict([[selected_nft['asset.num_sales'].iloc[0]]])
+        st.write(f"Predicted Price in Ether (using Linear Regression): {price[0][0]}")
         
-        # Linear Regression Prediction
-        if st.button("Predict Price with Linear Regression"):
-            price = lr_model.predict([[selected_nft['asset.num_sales'].iloc[0]]])
-            st.write(f"Predicted Price in Ether (using Linear Regression): {price[0]}")
-        
-        # LSTM Prediction
-        if st.button("Predict Price with LSTM"):
-            predicted_price = predict_price_lstm(nft_name, nft_data)
-            if isinstance(predicted_price, str):
-                st.write(predicted_price)
-            else:
-                st.write(f"Predicted Price in Ether (using LSTM): {predicted_price}")
+        lstm_result = predict_price_lstm(nft_name, nft_data)
+        if lstm_result:
+            st.write(f"Predicted Price in Ether (using LSTM): {lstm_result['Predicted Prices'][-1]}")
+        else:
+            st.write("LSTM isn't applicable for this NFT due to insufficient transaction data.")
     else:
         st.write("NFT not found in the dataset.")
