@@ -6,6 +6,7 @@ from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.neighbors import KNeighborsRegressor
 import plotly.graph_objects as go
+import plotly.express as px
 import pickle
 
 # Load the models and data
