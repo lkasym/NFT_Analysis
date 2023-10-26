@@ -89,14 +89,23 @@ if selection == "NFT Lookup":
 
 elif selection == "Market Analysis":
    
-    # Most Selling Categories
-    st.write("Most Selling Categories")
-    top_categories = nft_data['asset.collection.name'].value_counts()
-    if 'uncategorized' in top_categories.index:
-        top_categories = top_categories.drop('uncategorized')
-    if 'unknown' in top_categories.index:
-        top_categories = top_categories.drop('unknown')
-    st.bar_chart(top_categories.head(10))
+     # Top 10 Most Selling Collections
+    st.write("Top 10 Most Selling Collections")
+    top_collections = nft_data['asset.collection.name'].value_counts()
+    if 'uncategorized' in top_collections.index:
+        top_collections = top_collections.drop('uncategorized')
+    if 'unknown' in top_collections.index:
+        top_collections = top_collections.drop('unknown')
+    st.bar_chart(top_collections.head(10))
+
+    # Top 10 Most Selling NFTs
+    st.write("Top 10 Most Selling NFTs")
+    top_nfts = nft_data['asset.name'].value_counts()
+    if 'uncategorized' in top_nfts.index:
+        top_nfts = top_nfts.drop('uncategorized')
+    if 'unknown' in top_nfts.index:
+        top_nfts = top_nfts.drop('unknown')
+    st.bar_chart(top_nfts.head(10))
 
 
 elif selection == "User/Trader Analysis":
