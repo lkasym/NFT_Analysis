@@ -62,6 +62,8 @@ def predict_price_lstm(nft_name, data):
     return testPredict[-1][0]
 
 st.title("NFT Explorer and Price Predictor")
+if 'lstm_clicked' not in st.session_state:
+    st.session_state.lstm_clicked = False
 
 # NFT Lookup
 nft_name = st.text_input("Enter NFT name:")
