@@ -6,8 +6,7 @@ from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 import pickle
 import matplotlib.pyplot as plt
-import requests
-from bs4 import BeautifulSoup
+
 
 
 
