@@ -44,7 +44,8 @@ if nft_name:
         # Linear Regression Prediction
         if st.button("Predict Price with Linear Regression"):
             price = lr_model.predict([[selected_nft['asset.num_sales'].iloc[0]]])  # Adjust based on your feature column
-            st.write(f"Predicted Price in Ether (using Linear Regression): {price[0][0]}")
+            st.write(f"Predicted Price in Ether (using Linear Regression): {price[0]}")
+
         
         # LSTM Prediction
         if st.button("Predict Price with LSTM"):
