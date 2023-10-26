@@ -4,12 +4,12 @@ import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
-import plotly.express as px
 import plotly.graph_objects as go
 import pickle
 
-# Load the Linear Regression model
+# Load the models
 lr_model = pickle.load(open("linear_regression_model.pkl", "rb"))
+knn_model = pickle.load(open("/mnt/data/knn_model.pkl", "rb"))
 
 data_path = "Processed_OpenSea_NFT_1_Sales.csv"
 nft_data = pd.read_csv(data_path)
@@ -63,17 +63,17 @@ def predict_price_lstm(nft_name, data):
 
 st.title("NFT Explorer and Price Predictor")
 
-option = st.sidebar.selectbox(
-    "Choose Analysis",
-    ["NFT Lookup", "Trends and Analysis", "Market Analysis", "User/Trader Analysis", "NFT Categories"]
-)
+# Sidebar Selection
+st.sidebar.header("NFT Data Analysis")
+options = ["NFT Lookup", "Market Analysis", "User/Trader Analysis", "NFT Categories"]
+selection = st.sidebar.selectbox("Choose an option:", options)
 
-if option == "NFT Lookup":
+if selection == "NFT Lookup":
+    # NFT Lookup Code
     nft_name = st.text_input("Enter NFT name:")
 
     if nft_name:
         selected_nft = nft_data[nft_data['asset.name'] == nft_name]
-
         if not selected_nft.empty:
             # Display NFT details
             st.write(f"Name: {selected_nft['asset.name'].iloc[0]}")
@@ -82,66 +82,45 @@ if option == "NFT Lookup":
             st.write(f"Number of Sales: {selected_nft['asset.num_sales'].iloc[0]}")
             st.write(f"Last Sale Price in Ether: {selected_nft['price_in_ether'].iloc[0]}")
             
-            # Display previous owners
-            previous_owners = selected_nft['seller.user.username'].unique()
-            st.write("Previous Owners:", ", ".join(previous_owners))
-            
             # Linear Regression Prediction
-            if st.button("Predict Price with Linear Regression"):
+            if st.button("Rough Price Prediction (Linear Regression)"):
                 price = lr_model.predict([[selected_nft['asset.num_sales'].iloc[0]]])
-                st.write(f"Predicted Price in Ether (using Linear Regression): {price[0][0]}")
+                st.write(f"Predicted Price in Ether: {price[0]}")
             
+            # KNN Prediction
+            if st.button("Rough Price Prediction (KNN)"):
+                price_knn = knn_model.predict([[selected_nft['asset.num_sales'].iloc[0]]])
+                st.write(f"Predicted Price in Ether: {price_knn[0]}")
+
             # LSTM Prediction
-            if st.button("Predict Price with LSTM"):
+            if st.button("Better Price Prediction (LSTM)"):
                 predicted_price = predict_price_lstm(nft_name, nft_data)
                 if isinstance(predicted_price, str):
                     st.write(predicted_price)
                 else:
                     st.write(f"Predicted Price in Ether (using LSTM): {predicted_price}")
 
-            # Plotting the historical prices using Plotly
-            daily_avg_prices = selected_nft.groupby('sales_datetime')['price_in_ether'].mean().reset_index()
-            fig = px.line(daily_avg_prices, x='sales_datetime', y='price_in_ether', title='Average Daily NFT Sales Prices in Ether')
-            st.plotly_chart(fig)
+            # Previous Owners
+            previous_owners = selected_nft[['sales_datetime', 'seller.user.username']].sort_values(by='sales_datetime')
+            st.table(previous_owners)
 
-        else:
-            st.write("NFT not found in the dataset.")
+elif selection == "Market Analysis":
+    # Market Analysis Code
+    st.write("Market Analysis")
+    collections = nft_data['asset.collection.name'].value_counts().reset_index()
+    collections.columns = ['Collection Name', 'Number of Sales']
+    collections = collections[~collections['Collection Name'].isin(['uncategorized', 'unknown'])]
+    st.table(collections)
 
-# ... [Rest of the code for other options like "Trends and Analysis", "Market Analysis", etc.]
-# ... [The code from before, up to the "NFT Lookup" section]
+elif selection == "User/Trader Analysis":
+    # User/Trader Analysis Code
+    st.write("User/Trader Analysis")
+    # Placeholder for User/Trader Analysis code
 
-elif option == "Trends and Analysis":
-    st.header("Time Series Analysis of NFT Sales Prices")
-    
-    # Calculate daily average prices
-    daily_avg_prices = nft_data.groupby('sales_datetime')['price_in_ether'].mean().reset_index()
-    fig = px.line(daily_avg_prices, x='sales_datetime', y='price_in_ether', title='Average Daily NFT Sales Prices in Ether')
-    st.plotly_chart(fig)
-
-elif option == "Market Analysis":
-    st.header("Market Analysis: Collections in Demand")
-    
-    # Count sales by collection
-    collections = nft_data[nft_data['asset.collection.name'] != 'unknown'].groupby('asset.collection.name').size().sort_values(ascending=False).head(10)
-    fig = px.bar(collections, title='Top 10 Collections by Sales Volume')
-    st.plotly_chart(fig)
-
-elif option == "User/Trader Analysis":
-    st.header("Top Traders in the NFT Market")
-    
-    # Identify top traders by volume
-    top_traders = nft_data.groupby('seller.user.username').size().sort_values(ascending=False).head(10)
-    fig = px.bar(top_traders, title='Top 10 Traders by Sales Volume')
-    st.plotly_chart(fig)
-
-elif option == "NFT Categories":
-    st.header("NFT Sales by Category")
-    
-    # Exclude unknown and uncategorized entries
-    categories = nft_data[~nft_data['Category'].isin(['unknown', 'uncategorized'])]
-    cat_counts = categories.groupby('Category').size().sort_values(ascending=False)
-    fig = px.pie(cat_counts, values=cat_counts.values, names=cat_counts.index, title='Distribution of Sales Across NFT Categories')
-    st.plotly_chart(fig)
-
-# ... [End of Streamlit code]
-
+elif selection == "NFT Categories":
+    # NFT Categories Code
+    st.write("NFT Categories Analysis")
+    categories = nft_data['Category'].value_counts().reset_index()
+    categories.columns = ['Category Name', 'Number of Sales']
+    categories = categories[~categories['Category Name'].isin(['uncategorized', 'unknown'])]
+    st.table(categories)
