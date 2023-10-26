@@ -9,17 +9,7 @@ import matplotlib.pyplot as plt
 import requests
 from bs4 import BeautifulSoup
 
-def get_opensea_image_url(opensea_url):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    }
-    response = requests.get(opensea_url, headers=headers)
-    soup = BeautifulSoup(response.content, 'html.parser')
-    image_tag = soup.find("meta", {"property": "og:image"})
-    if image_tag:
-        return image_tag["content"]
-    else:
-        return None
+
 
 def predict_price_lstm(nft_name, data):
     if nft_name not in data['asset.name'].values:
@@ -81,9 +71,7 @@ if nft_name:
     selected_nft = nft_data[nft_data['asset.name'] == nft_name]
     
     if not selected_nft.empty:
-        image_url = get_opensea_image_url(selected_nft['asset.permalink'].iloc[0])
-        if image_url:
-            st.image(image_url)
+        
         
         st.write(f"Name: {selected_nft['asset.name'].iloc[0]}")
         st.write(f"Collection: {selected_nft['asset.collection.name'].iloc[0]}")
