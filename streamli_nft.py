@@ -5,6 +5,7 @@ from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 import plotly.graph_objects as go
+import pickle
 
 # Load the models and data
 lr_model = pickle.load(open("linear_regression_model.pkl", "rb"))
