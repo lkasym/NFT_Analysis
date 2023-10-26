@@ -1,19 +1,19 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.neighbors import KNeighborsRegressor
 import plotly.graph_objects as go
 import pickle
 
-# Load the models
-lr_model = pickle.load(open("linear_regression_model.pkl", "rb"))
-knn_model = pickle.load(open("knn_model.pkl", "rb"))
-
+# Load the models and data
 data_path = "Processed_OpenSea_NFT_1_Sales.csv"
 nft_data = pd.read_csv(data_path)
 nft_data['price_in_ether'] = nft_data['total_price'] / 1e18
+lr_model = pickle.load(open("linear_regression_model.pkl", "rb"))
+knn_model = pickle.load(open("knn_model.pkl", "rb"))
 
 def create_dataset(dataset, look_back=1):
     X, Y = [], []
@@ -63,64 +63,66 @@ def predict_price_lstm(nft_name, data):
 
 st.title("NFT Explorer and Price Predictor")
 
-# Sidebar Selection
-st.sidebar.header("NFT Data Analysis")
-options = ["NFT Lookup", "Market Analysis", "User/Trader Analysis", "NFT Categories"]
-selection = st.sidebar.selectbox("Choose an option:", options)
+selection = st.sidebar.selectbox("Choose an Analysis Option:", ["NFT Lookup", "Market Analysis", "User/Trader Analysis", "NFT Categories"])
 
 if selection == "NFT Lookup":
     # NFT Lookup Code
     nft_name = st.text_input("Enter NFT name:")
-
     if nft_name:
         selected_nft = nft_data[nft_data['asset.name'] == nft_name]
         if not selected_nft.empty:
-            # Display NFT details
-            st.write(f"Name: {selected_nft['asset.name'].iloc[0]}")
-            st.write(f"Collection: {selected_nft['asset.collection.name'].iloc[0]}")
-            st.write(f"Category: {selected_nft['Category'].iloc[0]}")
-            st.write(f"Number of Sales: {selected_nft['asset.num_sales'].iloc[0]}")
-            st.write(f"Last Sale Price in Ether: {selected_nft['price_in_ether'].iloc[0]}")
-            
-            # Linear Regression Prediction
-            if st.button("Rough Price Prediction (Linear Regression)"):
-                price = lr_model.predict([[selected_nft['asset.num_sales'].iloc[0]]])
-                st.write(f"Predicted Price in Ether: {price[0]}")
-            
-            # KNN Prediction
-            if st.button("Rough Price Prediction (KNN)"):
-                price_knn = knn_model.predict([[selected_nft['asset.num_sales'].iloc[0]]])
-                st.write(f"Predicted Price in Ether: {price_knn[0]}")
-
-            # LSTM Prediction
-            if st.button("Better Price Prediction (LSTM)"):
-                predicted_price = predict_price_lstm(nft_name, nft_data)
-                if isinstance(predicted_price, str):
-                    st.write(predicted_price)
-                else:
-                    st.write(f"Predicted Price in Ether (using LSTM): {predicted_price}")
-
-            # Previous Owners
-            previous_owners = selected_nft[['sales_datetime', 'seller.user.username']].sort_values(by='sales_datetime')
-            st.table(previous_owners)
+            # Display NFT details and previous owners
+            st.write("NFT Details")
+            st.table(selected_nft[['asset.name', 'asset.collection.name', 'Category', 'asset.num_sales', 'price_in_ether']])
+            # Price prediction using Linear Regression
+            price_lr = lr_model.predict([[selected_nft['asset.num_sales'].iloc[0]]])
+            st.write(f"Rough Price Prediction (using Linear Regression): {price_lr[0][0]}")
+            # Price prediction using KNN
+            price_knn = knn_model.predict([[selected_nft['asset.num_sales'].iloc[0]]])
+            st.write(f"Rough Price Prediction (using KNN): {price_knn[0][0]}")
+            # Price prediction using LSTM
+            price_lstm = predict_price_lstm(nft_name, nft_data)
+            if isinstance(price_lstm, str):
+                st.write(price_lstm)
+            else:
+                st.write(f"Better Price Prediction (using LSTM): {price_lstm}")
 
 elif selection == "Market Analysis":
     # Market Analysis Code
     st.write("Market Analysis")
-    collections = nft_data['asset.collection.name'].value_counts().reset_index()
-    collections.columns = ['Collection Name', 'Number of Sales']
-    collections = collections[~collections['Collection Name'].isin(['uncategorized', 'unknown'])]
-    st.table(collections)
+    top_categories = nft_data['Category'].value_counts().drop(['uncategorized', 'unknown'])
+    st.write("Most Popular Categories")
+    fig = go.Figure(data=[go.Bar(x=top_categories.index, y=top_categories.values)])
+    st.plotly_chart(fig)
 
 elif selection == "User/Trader Analysis":
-    # User/Trader Analysis Code
     st.write("User/Trader Analysis")
-    # Placeholder for User/Trader Analysis code
+    # Most selling collections
+    top_collections = nft_data['asset.collection.name'].value_counts().drop(['uncategorized', 'unknown']).head(10)
+    st.write("Most Selling Collections:")
+    fig = go.Figure(data=[go.Bar(x=top_collections.index, y=top_collections.values)])
+    st.plotly_chart(fig)
+    # Most active sellers
+    top_sellers = nft_data['seller.user.username'].value_counts().head(10)
+    st.write("Most Active Sellers:")
+    fig = go.Figure(data=[go.Bar(x=top_sellers.index, y=top_sellers.values)])
+    st.plotly_chart(fig)
+    # Most active buyers
+    top_buyers = nft_data[nft_data['winner_account.address'].isin(nft_data['seller.address'])]['winner_account.address'].value_counts().head(10)
+    buyer_names = []
+    for address in top_buyers.index:
+        name = nft_data[nft_data['seller.address'] == address]['seller.user.username'].iloc[0]
+        if pd.isna(name):
+            buyer_names.append(address)
+        else:
+            buyer_names.append(name)
+    st.write("Most Active Buyers:")
+    fig = go.Figure(data=[go.Bar(x=buyer_names, y=top_buyers.values)])
+    st.plotly_chart(fig)
 
 elif selection == "NFT Categories":
     # NFT Categories Code
-    st.write("NFT Categories Analysis")
-    categories = nft_data['Category'].value_counts().reset_index()
-    categories.columns = ['Category Name', 'Number of Sales']
-    categories = categories[~categories['Category Name'].isin(['uncategorized', 'unknown'])]
-    st.table(categories)
+    st.write("NFT Categories")
+    categories = nft_data['Category'].value_counts()
+    fig = go.Figure(data=[go.Pie(labels=categories.index, values=categories.values)])
+    st.plotly_chart(fig)
