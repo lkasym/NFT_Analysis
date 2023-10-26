@@ -88,20 +88,22 @@ if selection == "NFT Lookup":
                 st.write(f"Better Price Prediction (using LSTM): {price_lstm}")
 
 elif selection == "Market Analysis":
-    # Market Analysis Code
-    st.write("Market Analysis")
-    top_categories = nft_data['Category'].value_counts().drop(['uncategorized', 'unknown'])
-    st.write("Most Popular Categories")
-    fig = go.Figure(data=[go.Bar(x=top_categories.index, y=top_categories.values)])
-    st.plotly_chart(fig)
+   
+    # Most Selling Categories
+    st.write("Most Selling Categories")
+    top_categories = nft_data['asset.collection.name'].value_counts()
+    if 'uncategorized' in top_categories.index:
+        top_categories = top_categories.drop('uncategorized')
+    if 'unknown' in top_categories.index:
+        top_categories = top_categories.drop('unknown')
+    st.bar_chart(top_categories.head(10))
+
 
 elif selection == "User/Trader Analysis":
     st.write("User/Trader Analysis")
-    # Most selling collections
-    top_collections = nft_data['asset.collection.name'].value_counts().drop(['uncategorized', 'unknown']).head(10)
-    st.write("Most Selling Collections:")
-    fig = go.Figure(data=[go.Bar(x=top_collections.index, y=top_collections.values)])
-    st.plotly_chart(fig)
+    
+   
+    
     # Most active sellers
     top_sellers = nft_data['seller.user.username'].value_counts().head(10)
     st.write("Most Active Sellers:")
