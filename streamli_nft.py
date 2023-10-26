@@ -199,7 +199,7 @@ def main():
         st.write("Explore a curated selection of NFTs!")
          
         # Displaying the images in a grid format
-        col1, col2, col3 = st.beta_columns(3)
+        col1, col2, col3 = st.columns(3)
     
         for index, image_path in enumerate(nft_image_paths):
             with [col1, col2, col3][index % 3]:
