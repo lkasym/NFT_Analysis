@@ -85,7 +85,7 @@ if nft_name:
         # KNN Prediction
         if st.button("Predict Price with KNN"):
             price_knn = knn_model.predict([[selected_nft['asset.num_sales'].iloc[0]]])
-            st.write(f"Rough Price Prediction (using KNN): {price_knn[0][0]}")
+            st.write(f"Rough Price Prediction (using KNN): {price_knn[0]]}")
         
         # LSTM Prediction
         if st.button("Predict Price with LSTM"):
