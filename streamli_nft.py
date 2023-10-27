@@ -112,6 +112,7 @@ def main():
     Explore various functionalities. Choose from Price Predictor, Market Analysis, User/Trader Analysis, NFT Categories, and NFT Gallery.
     """)
 
+
     elif choice == "Price Predictor":
         st.subheader("Price Predictor")
         nft_name = st.text_input("Enter NFT name:")
