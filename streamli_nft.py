@@ -95,6 +95,7 @@ nft_image_paths = ["DALL·E 2023-10-27 03.41.57 - Photo of a dreamy universe whe
 "DALL·E 2023-10-27 03.24.30 - Watercolor painting of a serene beach where the sand is pixelated and the waves form a digital pattern. In the distance, a lighthouse beams a WiFi sig.png",
 "DALL·E 2023-10-27 03.24.26 - Photo of a futuristic cityscape at dusk with neon lights reflecting on the water and flying cars zooming past skyscrapers. People of various descents .png",
 ]
+logo_path = "DALL·E 2023-10-27 14.25.15 - Photo logo of a luxurious digital coin adorned with intricate patterns reminiscent of ancient Indian temple architecture. The coin's center features a.png"
 # Main Function
 def main():
     st.title("Welcome to NFT Explorer and Price Predictor!")
@@ -106,9 +107,10 @@ def main():
     choice = st.selectbox("Menu", menu)
 
     if choice == "Home":
-        st.write("""
-        Explore various functionalities. Choose from Price Predictor, Market Analysis, User/Trader Analysis, NFT Categories, and NFT Gallery.
-        """)
+    st.image(logo_path, use_column_width=True, caption="Company Logo")
+    st.write("""
+    Explore various functionalities. Choose from Price Predictor, Market Analysis, User/Trader Analysis, NFT Categories, and NFT Gallery.
+    """)
 
     elif choice == "Price Predictor":
         st.subheader("Price Predictor")
