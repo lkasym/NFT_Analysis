@@ -107,10 +107,10 @@ def main():
     choice = st.selectbox("Menu", menu)
 
     if choice == "Home":
-    st.image(logo_path, use_column_width=True, caption="Company Logo")
-    st.write("""
-    Explore various functionalities. Choose from Price Predictor, Market Analysis, User/Trader Analysis, NFT Categories, and NFT Gallery.
-    """)
+        st.image(logo_path, use_column_width=True, caption="Company Logo")
+        st.write("""
+            Explore various functionalities. Choose from Price Predictor, Market Analysis, User/Trader Analysis, NFT Categories, and NFT Gallery.
+                """)
 
 
     elif choice == "Price Predictor":
