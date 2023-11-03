@@ -41,6 +41,6 @@ Our EDA unveiled a multitude of insights:
 Our analysis peels back the layers of the NFT marketplace, offering a data-driven glimpse into its intricacies. From uncovering market dominance to understanding pricing dynamics, the exploration provides a roadmap for stakeholders to navigate this burgeoning digital economy. The journey toward unraveling the NFT marketplace's potential is fraught with both promise and peril. Continuous exploration, education, and ethical frameworks are pivotal in fostering a sustainable and responsible NFT ecosystem.
 
 ### GitHub Link
-For a deeper dive into our analysis, the dataset, and Python code, feel free to explore our [GitHub repository](https://github.com/your-repository-link).
+For a deeper dive into our analysis, the dataset, and Python code, feel free to explore our [GitHub repository](https://github.com/lkasym/NFT_Analysis).
 
 We invite our readers to delve into the data, engage with our findings, and contribute to the ongoing discourse surrounding the NFT marketplace. Your insights and perspectives are invaluable in unraveling the complexities of this digital frontier.
