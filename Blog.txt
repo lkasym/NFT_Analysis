@@ -1,0 +1,51 @@
+Title; Decoding the NFT Marketplace; An In depth Analysis of Sales, Trends and Stakeholder Behavior
+
+Authors; Lakshit Mundra & Parth Santosh Tripathi
+PRN; 059 & 071
+
+Introduction
+In the realm of technology Non Fungible Tokens (NFTs) have ushered in an era that combines technology, finance and digital ownership. Unlike cryptocurrencies such, as Bitcoin and Ethereum NFTs distinguish themselves by being unique and representing assets with values. They play a role in establishing and verifying ownership of items. The NFT market has become a hub for creativity, investment opportunities and innovation. It provides artists, musicians and content creators with a platform to monetize their creations. However this rapid growth also brings forth challenges and uncertainties. This exploration aims to shed light on the NFT marketplace by conducting an analysis based on data driven insights into sales, trends and stakeholder behavior.
+
+Problem Statement
+The growing realm of NFTs has introduced an approach, to owning digital assets. As it continues to evolve it presents challenges and dynamics that necessitate further examination.
+In this analysis we will explore the dominance of the market factors that impact prices, market volatility, the frenzy of speculation and investor strategies that collectively shape the NFT marketplace.
+
+Reasoning
+The increase, in activity within the NFT market, which has reached billions of dollars in sales in 2021 highlights the need for a comprehensive analysis. By examining data on NFT sales stakeholders can uncover patterns, trends and factors that influence the value of assets. Additionally understanding stakeholder behavior and currency dynamics is crucial for managing risks making analyses and gaining a nuanced understanding of market preferences and trends.
+
+Description of Dataset
+For this analysis we utilized a dataset sourced from Kaggle that covers aspects of NFT transactions. This dataset provides insights into the marketplace by including variables such, as sales_datetime, asset.id asset.name total_price payment_token.name among others. These variables play a role in dissecting the dynamics of the NFT market.
+
+Dataset; [OpenSea NFT Sales 2019 2021 (Kaggle)](https;//www.kaggle.com/datasets/bryanw26/opensea nft sales 2019 2021?resource=download)
+
+Data Preparation
+To ensure data consistency and address any missing values before analysis began several steps were taken to preprocess the data.
+In order to ensure the accuracy and reliability of our analysis we took steps during the phase. These steps included replacing missing asset.id values with a sequence filling in missing asset.name and asset.collection.name with 'Unknown' and removing the 'asset.collection.short_description' column.
+
+During our exploratory data analysis (EDA) we discovered insights;
+
+1. NFT Categories Distribution; We examined a graph that displayed the categories, in the NFT marketplace giving us a glimpse into the diverse range of assets available.
+2. Payment Tokens Distribution; Another graph showed us the payment tokens used in NFT transactions shedding light on the relationship between cryptocurrencies and NFTs.
+3. Ether Price Distribution; We explored a graph that highlighted how prices of NFTs vary within the marketplace revealing its nature.
+4. Monthly Sales Volume; By comparing sales volume year on year we gained insight into how the market has been growing over time.
+5. Total Sales Over Time; This time series visualization provided a view of sales allowing us to observe market trends over time.
+6. Top 10 NFT Collections by Sales Volume; We. Highlighted the popular collections in terms of sales volume indicating market preferences.
+7. Price Trends, for Top 10 Traded NFT Assets Over Time;
+
+Highlighting the price trends of the traded assets giving a glimpse into how the market values them.
+8. Top 10 Engaged Creators/Traders; Identifying the participants, in the market and shedding light on their behavior as stakeholders.
+9. Traded. Nfts by Top 10 Trader/Creators; Digging into the preferred collections and NFTs of the top traders indicating current market trends.
+10. Average Selling Price by Top 10 Active Users; This graph provides insights into how the active sellers set their prices.
+11. Average Selling Price of NFTs by Top Sellers Over Time; Displaying how pricing trends evolve among sellers.
+12. Average Return on Investment for Top Sellers; Highlighting the profit potential within the market by showcasing the ROI for sellers.
+13. Buying and Selling Prices of Top 10 Active Buyers; This comparison offers a glimpse into buying and selling dynamics among active buyers.
+
+Conclusion
+Our analysis uncovers aspects of the NFT marketplace providing data driven insights into its complexities. From revealing players to understanding price dynamics our exploration offers guidance for stakeholders navigating this growing economy. The journey, toward unlocking the potential of the NFT marketplace is filled with both opportunities and risks.
+
+Ongoing exploration, learning and the establishment of guidelines are crucial, for nurturing an responsible ecosystem for NFTs.
+
+GitHub Link
+If you're interested in delving into our analysis accessing the dataset or exploring the Python code please feel free to visit our [GitHub repository](https;//github.com/lkasym/NFT_Analysis).
+
+We warmly welcome our readers to engage with our findings and actively participate in the discussions about the NFT marketplace. Your valuable insights and perspectives play a role, in unraveling the complexities of this frontier.
